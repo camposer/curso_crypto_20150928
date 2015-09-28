@@ -19,7 +19,8 @@ public class TestSK {
 
 	public TestSK() throws Exception {
 		this.cipher = Cipher.getInstance(ALGORITMO);
-		this.key = getKey1(PASSPHRASE);
+		//this.key = getKey1(PASSPHRASE);
+		this.key = getKey();
 		System.out.println("key = " + StringUtil.getBase64(this.key.getEncoded()));
 	}
 
