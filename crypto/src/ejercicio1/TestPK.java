@@ -1,35 +1,28 @@
 package ejercicio1;
 
-import java.io.FileInputStream;
+import java.io.ByteArrayOutputStream;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.KeyStore;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.cert.Certificate;
 
 import javax.crypto.Cipher;
 
-import util.StringUtil;
+import util.ArchivoUtil;
 
-/**
- * $ keytool -genkeypair -keystore keystore.jks -keyalg rsa
- */
 public class TestPK {
-	private static final String ALGORITMO = "RSA"; // http://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html#impl
-	private static final String KEYSTORE = "file/keystore.jks";
-	private static final String KEYSTORE_PASSWORD = "123456";
-	private static final String PRIVATE_KEY_PASSWORD = KEYSTORE_PASSWORD;
-	private static final String KEYS_ALIAS = "mykey";
+	private static final String ALGORITMO = "RSA";
+	private static final String ARCHIVO_ORIGEN = "files/quijote.txt";
+	private static final String ARCHIVO_DESTINO_CIFRADO = "files/quijote.cifrado.txt";
+	private static final String ARCHIVO_DESTINO_DESCIFRADO = "files/quijote.descifrado.txt";
+    public static final int MAX_BLOQUE_CIFRADO = 117;
+    public static final int MAX_BLOQUE_DESCIFRADO = 128;
 	private Cipher cipher;
 	private Key publicKey;
 	private Key privateKey;
 
 	public TestPK() throws Exception {
 		this.cipher = Cipher.getInstance(ALGORITMO);
-		//generateKeys();
-		generateKeys1();
+		generateKeys();
 	}
 
 	private void generateKeys() throws Exception {
@@ -40,48 +33,65 @@ public class TestPK {
 		this.privateKey = keyPair.getPrivate();
 	}
 
-	private void generateKeys1() throws Exception {
-		FileInputStream is = new FileInputStream(KEYSTORE);
-		KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
-		keystore.load(is, KEYSTORE_PASSWORD.toCharArray());
-
-		Key key = keystore.getKey(KEYS_ALIAS, PRIVATE_KEY_PASSWORD.toCharArray());
-		if (key instanceof PrivateKey) {
-			// Get certificate of public key
-			Certificate cert = keystore.getCertificate(KEYS_ALIAS);
-			// Get public key
-			PublicKey publicKey = cert.getPublicKey();
-
-			// Return a key pair
-			KeyPair keyPair = new KeyPair(publicKey, (PrivateKey) key);
-			this.publicKey = keyPair.getPublic();
-			this.privateKey = keyPair.getPrivate();
-		}
-	}
-
 	public static void main(String[] args) throws Exception {
 		new TestPK().iniciar();
 	}
 
 	private void iniciar() throws Exception {
-		System.out.println("Cifrar Hola mundo");
-		String text = "Hola mundo";
+		System.out.println("Cifrando...");
 
-		byte[] cipherText = cifrar(text);
-		System.out.println("Texto cifrado = "
-				+ StringUtil.getBase64(cipherText));
+		cifrar(ARCHIVO_ORIGEN, ARCHIVO_DESTINO_CIFRADO);
 
-		byte[] plainText = descifrar(cipherText);
-		System.out.println("Mensaje descifrado = " + new String(plainText));
+		System.out.println("Descifrando...");
+		descifrar(ARCHIVO_DESTINO_CIFRADO, ARCHIVO_DESTINO_DESCIFRADO);
 	}
 
-	private byte[] descifrar(byte[] cipherText) throws Exception {
-		cipher.init(Cipher.DECRYPT_MODE, publicKey);
-		return cipher.doFinal(cipherText);
+	private void descifrar(String archivoOrigen, String archivoDestino) throws Exception {
+        cipher.init(Cipher.DECRYPT_MODE, publicKey);
+
+        byte[] cipherText = ArchivoUtil.leerArchivo(archivoOrigen);
+        int bloques = (int) Math.ceil((double) cipherText.length
+                        / MAX_BLOQUE_DESCIFRADO);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        int maxBloqueDescifradoLen = MAX_BLOQUE_DESCIFRADO;
+        for (int i = 0; i < bloques; i++) {
+                if (i + 1 == bloques)
+                        maxBloqueDescifradoLen = cipherText.length
+                                        - (i * MAX_BLOQUE_DESCIFRADO);
+
+                byte[] bloque = cipher.doFinal(cipherText, i * MAX_BLOQUE_DESCIFRADO,
+                                maxBloqueDescifradoLen);
+
+                baos.write(bloque);
+        }
+
+        byte[] text = baos.toByteArray();
+        ArchivoUtil.escribirArchivo(text, archivoDestino);
 	}
 
-	private byte[] cifrar(String string) throws Exception {
-		cipher.init(Cipher.ENCRYPT_MODE, privateKey);
-		return cipher.doFinal(string.getBytes());
+	private void cifrar(String archivoOrigen, String archivoDestino) throws Exception {
+        cipher.init(Cipher.ENCRYPT_MODE, privateKey);
+
+        byte[] plainText = ArchivoUtil.leerArchivo(archivoOrigen);
+        int bloques = (int) Math.ceil((double) plainText.length
+                        / MAX_BLOQUE_CIFRADO);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        int maxBloqueCifradoLen = MAX_BLOQUE_CIFRADO;
+
+        for (int i = 0; i < bloques; i++) {
+                if (i + 1 == bloques)
+                        maxBloqueCifradoLen = plainText.length
+                                        - (i * MAX_BLOQUE_CIFRADO);
+
+                byte[] bloqueCifrado = cipher.doFinal(plainText, i
+                                * MAX_BLOQUE_CIFRADO, maxBloqueCifradoLen);
+
+                baos.write(bloqueCifrado);
+        }
+
+        byte[] cipherText = baos.toByteArray();
+        ArchivoUtil.escribirArchivo(cipherText, archivoDestino);
 	}
 }
