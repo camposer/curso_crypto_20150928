@@ -11,7 +11,7 @@ public class StringUtil {
 	public static String getHex(byte[] digestText) {
 		StringBuffer result = new StringBuffer();
 		for (byte b : digestText) {
-		    result.append(String.format("%02X", b));
+		    result.append(String.format("%02x", b));
 		}
 		return result.toString();
 	}
