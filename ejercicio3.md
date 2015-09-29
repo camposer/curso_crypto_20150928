@@ -10,7 +10,7 @@ http://ftp.cixug.es/apache/tomcat/tomcat-8/v8.0.21/bin/apache-tomcat-8.0.21.zip
            port="8443" maxThreads="200"
            scheme="https" secure="true" SSLEnabled="true"
            keystoreFile="${user.home}/.keystore" keystorePass="changeit"
-           clientAuth="false" sslProtocol="TLS"/>
+           clientAuth="false" sslProtocol="TLS" keyAlias="changeit"/>
 ```
 
 NOTA: Si omite el keystoreFile utilizará por defecto ${user.home}/.keystore. Puede cambiarlo a cualquiera de los que estamos utilizando ahora
