@@ -3,6 +3,11 @@ package basico.jrmi;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
+/**
+ * Sus objetos serán objetos remotos
+ * 1. Extiende de UnicastRemoteObject
+ * 2. Implementa la interfaz remota
+ */
 public class HolaMundoServant
 		extends UnicastRemoteObject
 		implements HolaMundo {

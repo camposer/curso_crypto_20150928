@@ -1,0 +1,37 @@
+COMO CONFIGURAR JRMI CON SSL
+============================
+
+1-way
+-----
+
+0.- Crear carpeta dentro del proyecto donde se almacenarán los almacenes (Ej. stores)
+
+1.- Crear keystore en el servidor (ya genera certificado)
+	> keytool -genkeypair -keystore keystore.jks
+
+2.- Extraer (exportar) el certificado del keystore
+	>  keytool -exportcert -keystore keystore.jks -alias mykey -file mykey.cer
+	
+	NOTA: Utilizando "keytool -list -v" observar los stores creados y sus características
+
+3.- Crear trustore a partir del certificado generado
+	> keytool -import -trustcacerts -alias mykey -file mykey.cer -keystore truststore.ts
+
+4.- Ejecutar clase servidor con los siguientes VM arguments:
+-Djavax.net.ssl.keyStore=stores/keystore.jks -Djavax.net.ssl.keyStorePassword=123456 
+
+5.- Ejecutar clase cliente con los siguientes VM arguments:
+-Djavax.net.ssl.trustStore=stores/truststore.ts -Djavax.net.ssl.trustStorePassword=123456
+	
+2-way
+-----
+
+>  keytool -genkeypair -alias servidor -keystore keystore-servidor.jks
+>  keytool -list -keystore keystore-servidor.jks 
+>  keytool -exportcert -keystore keystore-servidor.jks -alias servidor -file servidor.cer
+>  keytool -import -trustcacerts -alias servidor -file servidor.cer -keystore truststore-cliente.ts
+>  keytool -genkeypair -alias cliente -keystore keystore-cliente.jks
+>  keytool -list -keystore keystore-cliente.jks 
+>  keytool -exportcert -keystore keystore-cliente.jks -alias cliente -file cliente.cer
+>  keytool -import -trustcacerts -alias cliente -file cliente.cer -keystore truststore-servidor.ts
+
