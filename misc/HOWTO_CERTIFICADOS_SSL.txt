@@ -1,0 +1,9 @@
+#Comandos ejecutados para la generación de almacenes de claves y confianza
+
+keytool -genkeypair -keystore keystore-cliente.jks -alias cliente
+keytool -export -alias cliente -keystore keystore-cliente.jks -file cliente.cer
+keytool -importcert -keystore truststore-servidor.ts -alias cliente -file cliente.cer
+keytool -genkeypair -keystore keystore-servidor.jks -alias servidor
+keytool -export -alias servidor -keystore keystore-servidor.jks -file servidor.cer
+keytool -importcert -keystore truststore-cliente.ts -alias servidor -file servidor.cer
+
