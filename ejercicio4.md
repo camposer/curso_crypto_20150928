@@ -25,7 +25,6 @@ Gestión de personas
 ```
 
 3.- Seguir el HOWTO COMO_CONF_SSL.txt (primera parte) y observar el funcionamiento de la aplicación utilizando SSL de 1 vía (1w).
-NOTA: Idealmente instale un sniffer como Wireshark y observe los paquetes que viajan en la red.
 
 
 4.- Seguir el HOWTO COMO_CONF_SSL.txt (segunda parte) y observar el funcionamiento de la aplicación utilizando SSL de 2 vías (2w).
