@@ -1,0 +1,4 @@
+grant {
+	permission java.io.FilePermission "file/quijote.txt", "read,write";
+	permission java.util.PropertyPermission "file.encoding", "read";
+};

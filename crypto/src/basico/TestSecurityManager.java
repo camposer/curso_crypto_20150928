@@ -9,7 +9,7 @@ import java.security.PrivilegedAction;
 import java.util.PropertyPermission;
 
 /**
- * -Djava.security.manager -Djava.security.policy=file/test.policy
+ * -Djava.security.manager -Djava.security.policy=files/test.policy
  */
 public class TestSecurityManager {
 
